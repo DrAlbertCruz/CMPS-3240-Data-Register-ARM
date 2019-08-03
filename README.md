@@ -1,8 +1,38 @@
-# CMPS-3240-Data-Register-ARM
+# CMPS 3240 Lab: Registers and memory
 
-Requires hexadecimals
-Strong familiarity with gdb
-2's compliment
+## Objectives
+
+1. Learn the difference between registers and memory
+2. Understand the concept of load-store architecture
+3. Introduction to register addressing format
+
+## Prerequisites
+
+* Conversion to/from hexadecimals
+* Strong familiarity with `gdb` from previous lab
+* 2's compliment
+* Some idea of how memory is structure in a program: data, stack, heap, etc.
+
+## Requirements
+
+The following is a list of requirements to complete the lab. Some labs can completed on any machine, whereas some require you to use a specific departmental teaching server. You will find this information here.
+
+### Software
+
+We will use the following programs:
+
+* `as`
+* `ld`
+* `git`
+* `gdb`
+
+### Compatability
+
+This lab requires the departmental ARM server. It will not work on `odin.cs.csubak.edu`, `sleipnir.cs.csubak.edu`, other PCs, etc. that have x86 processors. It may work on a Raspberry Pi or similar system on chip with ARM, but it must be ARMv8-a.
+
+| Linux | Mac | Windows |
+| :--- | :--- | :--- |
+| Limited | No | No |
 
 ## Background
 
@@ -99,6 +129,7 @@ In this section we cover how your assembly code can interact with the memory. In
 * What you think of as variables in a high level language are stored in memory, not registers. These locations can be named with identifiers in your code, unlike registers.
 * In practice, where these values are placed in memory may be challenging to determine at compile-time. When debugging, there will be a specific instruction to 'see'  the address where the data was placed.
 * Perhaps the most important concept is the idea of a load-store architecture. You cannot perform arithmetic on memory directly.
+* An address refers to a specific byte. Note that this is less than the size of a word, which is four bytes. Accidents can happen and should be avoided.
 
 The general idea for load-store operations is:
 1. Often as a first step, you will set a register to point to the memory you want to interact with. Sometimes you will already have the pointer loaded, or you will know to interact with a specific address.
@@ -148,7 +179,7 @@ The initialization of `coyote` is interesting because you requisition the data c
 
 `.comm fox, 200, 4` is unique from the others. We do not initialize is. Instead, we use the `.comm` directive, which orders the linker to requisition uninitialized array space. The first argument is the name, the second argument is the length, and the third argument is the length of each element in bytes. Again, `int` is 4-bytes, so that's why we enter 4 here.
 
-So that was fun and interesting, if you have `gdb` open still, there are two commands that will help you peek at the variables in memory. The first is to resolve the address:
+So that was fun and interesting, if you have `gdb` open still, there are two commands that will help you peek at the variables in memory. *Note that it does not matter which breakpoint you're at, because we haven't modified these variables yet. Just make sure gdb is running the process.* The first is to resolve the address:
 
 ```gdb
 (gdb) p &badger
@@ -178,8 +209,114 @@ The flags from left-to-right: display 1 element, format it as a hexadecimal, ele
 0x4100e8:	7	0	0	0
 ```
 
-This command translates to: display the 4-bytes at the identifier `badger`, formatted as decimals. Note that you can see the data is little endian, that is, bytes within a word are stored in reverse order.
+This command translates to: display the 4-bytes at the identifier `badger`, formatted as decimals. Note that you can see the data is little endian, that is, bytes within a word are stored in reverse order. *Storing it the perhaps intuitive way is called big endian.*
+
+#### Arithmetic on memory
+
+The first exercise we will implement on memory is to increment a single non-array variable. Consider the following commands:
+
+```ARM
+_a2:
+        ldr x0, =badger
+_b1:
+        ldr x2, [x0]
+        add x2, x2, 3
+_b2:
+        str x2, [x0]
+_b3:
+```
+
+We will take this one slowly (hence the many breakpoints). The first instruction, `ldr` fetches the memory address of `badger` and turns `x0` into a pointer. By convention, static labels must be prefixed with a `=`. Check what happened to `x0`:
+
+```gdb
+(gdb) br _b1
+...
+(gdb) run
+...
+(gdb) info registers x0
+x0             0x4100e8	4260072
+```
+
+So, when loading the program, `badger` was placed at the memory address 0x4100e8. This is roughly equivalent to the following C statement: `x0 = &badger`. Continue to the `_b2` breakpoint. `ldr x2, [x0]` when used this way dereferences the memory address contained in `x0`. `ldr x2, [x0]` is roughly equivalent to the C statement: `x2 = *x0`, and we know that `x0` points to `badger`, so this fetches the value at `badger` and places it in `x2`. Investigating this with `gdb`:
+
+```gdb
+(gdb) br _b2
+...
+(gdb) continue
+...
+(gdb) info registers x0 x2
+x0             0x4100e8	4260072
+x2             0xa	10
+(gdb) x/4db &badger
+0x4100e8:	7	0	0	0
+```
+
+`x0` still contains the pointer the `badger`. `x2` was loaded with the initial value of `badger`, and we added 3 to it. Note that the `badger` memory location still holds 7. Continue to `_b3`.
+
+```gdb
+(gdb) break _b3
+...
+(gdb) continue
+...
+(gdb) x/1dw &badger
+0x4100e8:	10
+```
+
+Finally, `str x2, [x0]` writes 10 into `badger`.
+
+### Indexing Arrays
+
+The assembly brackets [] are similar to the C-language dereference operator except it can be used with the following forms:
+
+1. [R]: Where R is a register. Example: `ldr x0, [x2]`. Just dereference `x2`.
+2. [R,imm]: R is a register, and imm is the number of bytes to skip. Example: `ldr w1, [w2,4]`, which would be roughly equivalent to the C statement `int w1 = w1[1]`.
+
+There is also a third method of indexing, which we will skip for this lab due to complexity.<sup>2</sup> The following ARM code:
+
+```arm
+_b3:
+        ldr x1, =coyote
+        ldr w2, [x1,#8]
+        add w2, w2, #100
+        str w2, [x1,#8]
+_b4:
+```
+
+This code is roughly equivalent to the following C-language code:
+
+```c
+coyote[2] = coyote[2] + 100
+```
+
+Note that we use the `w` registers here to let the machine know it should only draw 32 bits (a word). If you tried to use `x` in this scenario it would attempt to draw 64 bits and read both `coyote[2]` and `coyote[3]` as a single 64 bit integer. This would cause a segmentation fault. *Feel free to try it if you want to see it in action.*
+
+Also, note that 2 time the length of an integer is 8 bytes. Don't skip to `_b3` yet, first view the initial contents of the array:
+
+```arm
+(gdb) x/6dw &coyote
+0x4100f0:	0	2	4	6
+0x410100:	8	10
+```
+
+Now, skip to `_b4` and run the code:
+
+```arm
+(gdb) x/6dw &coyote
+0x410108:	0	2	104	6
+0x410118:	8	10
+```
+
+Viola, we incremented a single element within the array `coyote`. Now that that's done, you can get going on the lab finally.
+
+### Approach
+
+Your task is to use your knowledge of the above to copy the values of `coyote` into `fox`. `fox` is much larger than `coyote`, so you should only copy the first 6 elements. We haven't covered control of flow yet (for loops or if statements), so you'll have to make due without them.
+
+### Check Off
+
+Demonstrate that your code works in `gdb` for full credit.
 
 ### References
 
 <sup>1</sup>https://ftp.gnu.org/old-gnu/Manuals/gdb/html_node/gdb_55.html
+<sup>2</sup>https://azeria-labs.com/memory-instructions-load-and-store-part-4/
