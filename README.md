@@ -1,4 +1,4 @@
-# CMPS 3240 Lab: Registers and memory
+# CMPS 3240 Lab: Registers and Memory
 
 ## Objectives
 
@@ -40,7 +40,13 @@ This lab requires the departmental ARM server, `fenrir.cs.csubak.edu`. It will n
 
 ### Part 1 - Register Operations
 
-This first part focuses on registers. The version of ARM we are using has 31 64-bit general-purpose registers `x0`-`x30`, the bottom halves of which are accessible as `w0`-`w30` (Bits 0-31). There are also four stack pointer registers, three exception link registers, and three program status registers which we will cover later on. There is also the `pc`, which is the address of the current instruction. There is also a flag register `cpsr` used for branching and exceptions/interrupts. Register 31 is a special register that, depending on the instruction, is used as a stack register or a zero-reference value.
+This first part focuses on registers. The version of ARM we are using has 31 64-bit general-purpose registers, called `r0`-`r30` formally, but not in practice. You must specify if you are addressing 64 bits or 32 bits. `x0`-`x30` are 64-bit addressing and `w0`-`w30` are 32-bit addressing. `wt` refers to the same register as `xt`, but only the lower half--bits 0 to 31:
+
+| 64-bit register `xt` |
+
+| Upper half of 64-bit register | Lower half of 64-bit register - `wt` |
+
+There are also four stack pointer registers, three exception link registers, and three program status registers which we will cover later on. There is also the `pc`, which is the address of the current instruction. There is also a flag register `cpsr` used for branching and exceptions/interrupts. Register 31 is a special register that, depending on the instruction, is used as a stack register or a zero-reference value.
 
 Before proceeding you should have two terminals open. One for viewing `hello.s` and another for running the program with `gdb`. Go ahead and open up `hello.s` with your favorite text editor:
 
