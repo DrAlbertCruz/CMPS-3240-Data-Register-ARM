@@ -46,6 +46,8 @@ This first part focuses on registers. The version of ARM we are using has 31 64-
 
 | Upper half of 64-bit register | Lower half of 64-bit register - `wt` |
 
+Register `r31` is a special register, referred to as `wxr` or `xzr` depending on size. If used as a source register, it will supply a reference value of 0. If used a destination, the result will be discarded.
+
 There are also four stack pointer registers, three exception link registers, and three program status registers which we will cover later on. There is also the `pc`, which is the address of the current instruction. There is also a flag register `cpsr` used for branching and exceptions/interrupts. Register 31 is a special register that, depending on the instruction, is used as a stack register or a zero-reference value.
 
 Before proceeding you should have two terminals open. One for viewing `hello.s` and another for running the program with `gdb`. Go ahead and open up `hello.s` with your favorite text editor:
