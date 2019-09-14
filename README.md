@@ -341,7 +341,9 @@ Your task is to use your knowledge of the above to copy the values of `coyote` i
 
 ### Check Off
 
-Demonstrate that your code works in `gdb` for full credit.
+Demonstrate that your code works in `gdb` for full credit, for extra credit:
+
+![Photos of Spiderman](https://i.imgur.com/cIfZ0EZ.jpg?1)
 
 ### References
 
