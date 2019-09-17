@@ -82,7 +82,7 @@ _a1:
 The `mov` instruction used in this way loads a literal value into a register with a right-to-left assignment. `mov x0, 0xffffffffffffffff` places `0xffffffffffffffff` into `x0`. Note that this is the largest unsigned value possible that one can place in a 64-bit register. `mov w1, 0xffffffff` is similar, except note that it refers to `w1`. Verify this with `gdb`. Go ahead and `make`, then run `gdb`:
 
 ```shell
-$ gdb ./hello
+$ gdb ./hello.out
 ```
 
 and set a breakpoint to `_start` and `_a1`, then run the program.
