@@ -339,7 +339,7 @@ Viola, we incremented a single element within the array `coyote`. Now that that'
 
 Your task is to use your knowledge of the above to copy the values of `coyote` into `fox`. `fox` is much larger than `coyote`, so you should only copy the first 6 elements. We haven't covered control of flow yet (for loops or if statements), so just explicitly code the instructions.
 
-Note that you must change the *values*, not the pointers.
+Note that you must change the values, not the pointers.
 
 ![Pointers](https://cs.csubak.edu/~albert/C-658VsXoAo3ovC.jpg)
 
