@@ -341,7 +341,7 @@ Your task is to use your knowledge of the above to copy the values of `coyote` i
 
 Note that you must change the values, not the pointers.
 
-![Pointers](https://cs.csubak.edu/~albert/C-658VsXoAo3ovC.jpg)
+![Pointers.](https://cs.csubak.edu/~albert/C-658VsXoAo3ovC.jpg)
 
 ### Check Off
 
