@@ -339,9 +339,13 @@ Viola, we incremented a single element within the array `coyote`. Now that that'
 
 Your task is to use your knowledge of the above to copy the values of `coyote` into `fox`. `fox` is much larger than `coyote`, so you should only copy the first 6 elements. We haven't covered control of flow yet (for loops or if statements), so just explicitly code the instructions.
 
+Note that you must change the *values*, not the pointers.
+
+![Pointers](https://i.kym-cdn.com/entries/icons/original/000/023/397/C-658VsXoAo3ovC.jpg1)
+
 ### Check Off
 
-Demonstrate that your code works in `gdb` for full credit, for extra credit:
+Demonstrate that your code works in `gdb` for full credit, if you finish early:
 
 ![Photos of Spiderman](https://i.imgur.com/cIfZ0EZ.jpg?1)
 
