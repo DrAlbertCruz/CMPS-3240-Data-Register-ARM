@@ -93,7 +93,7 @@ and set a breakpoint to `_start` and `_a1`, then run the program.
 (gdb) br _a1
 ...
 (gdb) run
-``
+```
 
 It should stop at `_start`, which means no instructions from the program are executed. Check the initial values of the two registers:
 
